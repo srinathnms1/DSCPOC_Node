@@ -1,0 +1,262 @@
+-- Table: public.DCS_DriverMaster
+
+-- DROP TABLE public."DCS_DriverMaster";
+
+CREATE TABLE public."DCS_DriverMaster"
+(
+    "DriverId" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 100000 CACHE 1 ),
+    "DriverName" character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    "DriverMobile" character varying(50) COLLATE pg_catalog."default",
+    "CreatedDate" timestamp without time zone NOT NULL,
+    "ModifiedDate" timestamp without time zone,
+    CONSTRAINT "PK_DCS_DriverMaster" PRIMARY KEY ("DriverId")
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."DCS_DriverMaster"
+    OWNER to postgres;
+
+-----------
+
+-- Table: public.DCS_DriverService
+
+-- DROP TABLE public."DCS_DriverService";
+
+CREATE TABLE public."DCS_DriverService"
+(
+    "DriverServiceId" integer NOT NULL,
+    "DriverVehicleId" integer NOT NULL,
+    "VehicleStartTime" timestamp without time zone,
+    "VehicleEndTime" timestamp without time zone,
+    "RestingStartTime" timestamp without time zone,
+    "RestingEndTime" timestamp without time zone,
+    "CreatedDate" timestamp without time zone NOT NULL,
+    "ModifiedDate" timestamp without time zone,
+    "RestTimeHours" double precision,
+    "DrivingTimeHours" double precision,
+    "WorkTimeHours" double precision,
+    "DistanceTravelled" double precision,
+    CONSTRAINT "PK_DCS_DriverService" PRIMARY KEY ("DriverServiceId"),
+    CONSTRAINT "FK_171" FOREIGN KEY ("DriverVehicleId")
+        REFERENCES public."DCS_DriverVehicle" ("DriverVehicleId") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."DCS_DriverService"
+    OWNER to postgres;
+-- Index: fkIdx_171
+
+-- DROP INDEX public."fkIdx_171";
+
+CREATE INDEX "fkIdx_171"
+    ON public."DCS_DriverService" USING btree
+    ("DriverVehicleId" ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+----------------
+
+
+-- Table: public.DCS_DriverVehicle
+
+-- DROP TABLE public."DCS_DriverVehicle";
+
+CREATE TABLE public."DCS_DriverVehicle"
+(
+    "DriverVehicleId" integer NOT NULL,
+    "VehicleId" integer NOT NULL,
+    "DriverId" integer NOT NULL,
+    "CreatedDate" timestamp without time zone NOT NULL,
+    "ModifiedDate" timestamp without time zone,
+    CONSTRAINT "PK_DCS_DriverVehicle" PRIMARY KEY ("DriverVehicleId"),
+    CONSTRAINT "FK_156" FOREIGN KEY ("VehicleId")
+        REFERENCES public."DCS_VehicleMaster" ("VehicleId") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT "FK_159" FOREIGN KEY ("DriverId")
+        REFERENCES public."DCS_DriverMaster" ("DriverId") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."DCS_DriverVehicle"
+    OWNER to postgres;
+-- Index: fkIdx_156
+
+-- DROP INDEX public."fkIdx_156";
+
+CREATE INDEX "fkIdx_156"
+    ON public."DCS_DriverVehicle" USING btree
+    ("VehicleId" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: fkIdx_159
+
+-- DROP INDEX public."fkIdx_159";
+
+CREATE INDEX "fkIdx_159"
+    ON public."DCS_DriverVehicle" USING btree
+    ("DriverId" ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+--------------
+
+-- Table: public.DCS_FuelInfo
+
+-- DROP TABLE public."DCS_FuelInfo";
+
+CREATE TABLE public."DCS_FuelInfo"
+(
+    "DriverVehicleId" integer NOT NULL,
+    "FuelInfoId" integer NOT NULL,
+    "CurrentVolume" double precision,
+    "RefuelVolume" double precision,
+    "PacketTime" timestamp without time zone,
+    CONSTRAINT "PK_DCS_FuelInfo" PRIMARY KEY ("FuelInfoId"),
+    CONSTRAINT "FK_192" FOREIGN KEY ("DriverVehicleId")
+        REFERENCES public."DCS_DriverVehicle" ("DriverVehicleId") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."DCS_FuelInfo"
+    OWNER to postgres;
+-- Index: fkIdx_192
+
+-- DROP INDEX public."fkIdx_192";
+
+CREATE INDEX "fkIdx_192"
+    ON public."DCS_FuelInfo" USING btree
+    ("DriverVehicleId" ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+------------------
+
+-- Table: public.DCS_Location
+
+-- DROP TABLE public."DCS_Location";
+
+CREATE TABLE public."DCS_Location"
+(
+    "LocationId" integer NOT NULL,
+    "Latitude" double precision,
+    "Longitude" double precision,
+    "VehicleRealTimeInfoId" integer NOT NULL,
+    CONSTRAINT "PK_DCS_Location" PRIMARY KEY ("LocationId"),
+    CONSTRAINT "FK_191" FOREIGN KEY ("VehicleRealTimeInfoId")
+        REFERENCES public."DCS_VehicleRealTimeInfo" ("VehicleRealTimeInfoId") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."DCS_Location"
+    OWNER to postgres;
+
+----------------
+
+-- Table: public.DCS_VehicleMaster
+
+-- DROP TABLE public."DCS_VehicleMaster";
+
+CREATE TABLE public."DCS_VehicleMaster"
+(
+    "VehicleId" integer NOT NULL,
+    "VehicleLicenseNo" character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    "VehicleName" character varying(50) COLLATE pg_catalog."default",
+    "CreatedDate" timestamp without time zone NOT NULL,
+    "ModifiedDate" timestamp without time zone,
+    "TankCapacity" double precision,
+    CONSTRAINT "PK_DCS_VehicleMaster" PRIMARY KEY ("VehicleId")
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."DCS_VehicleMaster"
+    OWNER to postgres;
+
+---------------
+
+
+-- Table: public.DCS_VehicleRealTimeInfo
+
+-- DROP TABLE public."DCS_VehicleRealTimeInfo";
+
+CREATE TABLE public."DCS_VehicleRealTimeInfo"
+(
+    "VehicleRealTimeInfoId" integer NOT NULL,
+    "DriverVehicleId" integer NOT NULL,
+    "PacketTime" timestamp without time zone,
+    "VehicleSpeed" double precision,
+    "HarshTurning" integer,
+    "HarshBreaking" integer,
+    "CreatedDate" timestamp without time zone NOT NULL,
+    "ModifiedDate" timestamp without time zone,
+    "IgnitionStatus" bit(1),
+    "LoadVolume" double precision,
+    CONSTRAINT "PK_DCS_VehicleRealTimeInfo" PRIMARY KEY ("VehicleRealTimeInfoId"),
+    CONSTRAINT "FK_184" FOREIGN KEY ("DriverVehicleId")
+        REFERENCES public."DCS_DriverVehicle" ("DriverVehicleId") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."DCS_VehicleRealTimeInfo"
+    OWNER to postgres;
+ALTER TABLE public."DCS_VehicleRealTimeInfo"
+    ALTER COLUMN "IgnitionStatus" SET STORAGE PLAIN;
+-- Index: fkIdx_184
+
+-- DROP INDEX public."fkIdx_184";
+
+CREATE INDEX "fkIdx_184"
+    ON public."DCS_VehicleRealTimeInfo" USING btree
+    ("DriverVehicleId" ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+
+-------------------------
+
+-- Table: public.dcs_logs
+
+-- DROP TABLE public.dcs_logs;
+
+CREATE TABLE public.dcs_logs
+(
+    message text COLLATE pg_catalog."default",
+    message_template text COLLATE pg_catalog."default",
+    level integer,
+    "timestamp" timestamp without time zone,
+    exception text COLLATE pg_catalog."default",
+    log_event jsonb
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.dcs_logs
+    OWNER to postgres;
